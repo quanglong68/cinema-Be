@@ -49,6 +49,8 @@ import com.sba301.cinemaai.service.UserService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,6 +74,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookingServiceImpl implements BookingService {
 
     private static final int HOLD_MINUTES = 3;
+    private static final ZoneId ICT = ZoneId.of("Asia/Ho_Chi_Minh");
+
+    private static LocalDateTime nowICT() {
+        return ZonedDateTime.now(ICT).toLocalDateTime();
+    }
     private static final int CHECK_IN_LEAD_MINUTES = 30;
     private static final List<BookingStatus> ACTIVE_CHECKOUT_STATUSES = List.of(
             BookingStatus.HOLDING,
@@ -126,7 +133,7 @@ public class BookingServiceImpl implements BookingService {
         validateCoupleSeatPairs(requestedSeats);
 
         Booking booking = bookingRepository.save(new Booking(newBookingCode(), user, showtime,
-                LocalDateTime.now().plusMinutes(HOLD_MINUTES)));
+                nowICT().plusMinutes(HOLD_MINUTES)));
         BigDecimal subtotal = BigDecimal.ZERO;
 
         for (Seat seat : requestedSeats) {
@@ -164,7 +171,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getStatus() != BookingStatus.HOLDING) {
             throw new BadRequestException("Booking is not in holding status");
         }
-        if (booking.getHoldExpiresAt() != null && booking.getHoldExpiresAt().isBefore(LocalDateTime.now())) {
+        if (booking.getHoldExpiresAt() != null && booking.getHoldExpiresAt().isBefore(nowICT())) {
             expireBooking(booking);
             throw new BadRequestException("Seat hold has expired");
         }
@@ -211,7 +218,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getStatus() != BookingStatus.HOLDING && booking.getStatus() != BookingStatus.PENDING_PAYMENT) {
             throw new BadRequestException("Only holding bookings can be updated");
         }
-        if (booking.getHoldExpiresAt() != null && booking.getHoldExpiresAt().isBefore(LocalDateTime.now())) {
+        if (booking.getHoldExpiresAt() != null && booking.getHoldExpiresAt().isBefore(nowICT())) {
             expireBooking(booking);
             throw new BadRequestException("Seat hold has expired");
         }
@@ -246,7 +253,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setSubtotal(subtotal);
         booking.setDiscountAmount(discountAmount);
         booking.setTotalAmount(subtotal.subtract(discountAmount));
-        booking.setHoldExpiresAt(LocalDateTime.now().plusMinutes(HOLD_MINUTES));
+        booking.setHoldExpiresAt(nowICT().plusMinutes(HOLD_MINUTES));
         bookingRepository.saveAndFlush(booking);
         return toResponse(booking);
     }
@@ -416,7 +423,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookingSeat.getStatus() != SeatRuntimeStatus.BOOKED) {
             throw new BadRequestException("Seat is not in booked status");
         }
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = nowICT();
         LocalDateTime checkInOpenAt = booking.getShowtime().getStartTime().minusMinutes(CHECK_IN_LEAD_MINUTES);
         if (now.isBefore(checkInOpenAt)) {
             throw new BadRequestException("Check-in opens 30 minutes before showtime");
@@ -433,7 +440,7 @@ public class BookingServiceImpl implements BookingService {
                 .stream()
                 .allMatch(bookingSeat -> bookingSeat.getStatus() == SeatRuntimeStatus.CHECKED_IN);
         if (allCheckedIn && booking.getStatus() == BookingStatus.PAID) {
-            booking.setCheckedInAt(LocalDateTime.now());
+            booking.setCheckedInAt(nowICT());
             booking.setStatus(BookingStatus.USED);
         }
     }
@@ -455,11 +462,11 @@ public class BookingServiceImpl implements BookingService {
     public int releaseExpiredHolds() {
         List<Booking> expiredBookings = bookingRepository.findByStatusAndHoldExpiresAtBefore(
                 BookingStatus.HOLDING,
-                LocalDateTime.now()
+                nowICT()
         );
         expiredBookings.addAll(bookingRepository.findByStatusAndHoldExpiresAtBefore(
                 BookingStatus.PENDING_PAYMENT,
-                LocalDateTime.now()
+                nowICT()
         ));
         expiredBookings.forEach(this::expireBooking);
         return expiredBookings.size();
@@ -682,7 +689,7 @@ public class BookingServiceImpl implements BookingService {
     private boolean isBlockingSeat(BookingSeat bookingSeat) {
         Booking booking = bookingSeat.getBooking();
         if (bookingSeat.getStatus() == SeatRuntimeStatus.HOLDING && booking.getStatus() == BookingStatus.HOLDING) {
-            return booking.getHoldExpiresAt() == null || booking.getHoldExpiresAt().isAfter(LocalDateTime.now());
+            return booking.getHoldExpiresAt() == null || booking.getHoldExpiresAt().isAfter(nowICT());
         }
         return bookingSeat.getStatus() == SeatRuntimeStatus.BOOKED
                 || bookingSeat.getStatus() == SeatRuntimeStatus.CHECKED_IN;
@@ -709,7 +716,7 @@ public class BookingServiceImpl implements BookingService {
             loyaltyPointService.revokePointsFromBooking(booking.getUser(), booking);
         }
         loyaltyPointService.restoreRedeemedPointsFromBooking(booking.getUser(), booking);
-        booking.setCancelledAt(LocalDateTime.now());
+        booking.setCancelledAt(nowICT());
         booking.setStatus(BookingStatus.CANCELLED);
     }
 
