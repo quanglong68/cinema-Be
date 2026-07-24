@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,7 +25,9 @@ public class VNPayServiceImpl implements VNPayService {
     private final VNPayConfig vnPayConfig;
 
     public String buildPaymentUrl(String txnRef, BigDecimal amount, String orderInfo, String clientIp) {
-        return buildPaymentUrl(txnRef, amount, orderInfo, clientIp, LocalDateTime.now().plusMinutes(15));
+        // Sửa chỗ này bằng cách dùng trực tiếp ZonedDateTime với ZoneId chuẩn Việt Nam:
+        LocalDateTime nowIctTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        return buildPaymentUrl(txnRef, amount, orderInfo, clientIp, nowIctTime.plusMinutes(15));
     }
 
     public String buildPaymentUrl(String txnRef, BigDecimal amount, String orderInfo, String clientIp,
