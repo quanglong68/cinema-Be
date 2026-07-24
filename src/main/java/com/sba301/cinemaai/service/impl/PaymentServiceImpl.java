@@ -193,7 +193,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (foodOrder.getStatus() != FoodOrderStatus.PENDING_PAYMENT) {
             throw new BadRequestException("Only pending food orders can be paid");
         }
-        if (foodOrder.getExpiresAt() == null || !LocalDateTime.now().isBefore(foodOrder.getExpiresAt())) {
+        if (foodOrder.getExpiresAt() == null || !java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).isBefore(foodOrder.getExpiresAt())) {
             throw new BadRequestException("Food order payment window has expired");
         }
     }
@@ -219,7 +219,7 @@ public class PaymentServiceImpl implements PaymentService {
             FoodOrder foodOrder = payment.getFoodOrder();
             if (foodOrder.getStatus() != FoodOrderStatus.PENDING_PAYMENT
                     || foodOrder.getExpiresAt() == null
-                    || !LocalDateTime.now().isBefore(foodOrder.getExpiresAt())) {
+                    || !java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).isBefore(foodOrder.getExpiresAt())) {
                 markPaymentFailed(payment, "FOOD_ORDER_EXPIRED: " + toJson(params));
                 if (foodOrder.getStatus() == FoodOrderStatus.PENDING_PAYMENT) {
                     foodOrder.setStatus(FoodOrderStatus.EXPIRED);
@@ -229,11 +229,11 @@ public class PaymentServiceImpl implements PaymentService {
         } else {
             Booking booking = payment.getBooking();
             LocalDateTime holdExpiry = booking.getHoldExpiresAt();
-            if (holdExpiry != null && LocalDateTime.now().isAfter(holdExpiry)) {
+            if (holdExpiry != null && java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).isAfter(holdExpiry)) {
                 // Hold đã hết hạn — từ chối xác nhận, không được bán ghế
                 log.warn(
                     "Payment {} for booking {} REJECTED: hold expired at {} (now={}). Seats NOT confirmed.",
-                    payment.getId(), booking.getBookingCode(), holdExpiry, LocalDateTime.now()
+                    payment.getId(), booking.getBookingCode(), holdExpiry, java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"))
                 );
                 markPaymentFailed(payment, "HOLD_EXPIRED: " + toJson(params));
                 return;
@@ -245,7 +245,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (payment.getFoodOrder() != null) {
             FoodOrder foodOrder = payment.getFoodOrder();
             foodOrder.setStatus(FoodOrderStatus.PAID);
-            foodOrder.setPaidAt(LocalDateTime.now());
+            foodOrder.setPaidAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
             var customer = foodOrder.getCustomer() != null
                     ? foodOrder.getCustomer()
                     : foodOrder.getBooking().getUser();
@@ -282,14 +282,14 @@ public class PaymentServiceImpl implements PaymentService {
     private void markPaid(Booking booking, String qrCode) {
         requireBookingStatus(booking, BookingStatus.PENDING_PAYMENT, "Only pending payment booking can be marked as paid");
         booking.setQrCode(qrCode);
-        booking.setPaidAt(LocalDateTime.now());
+        booking.setPaidAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         booking.setStatus(BookingStatus.PAID);
     }
 
     private void markPaymentSuccess(Payment payment, String transactionId, String callbackPayload, Map<String, String> params) {
         payment.setTransactionId(transactionId);
         payment.setCallbackPayload(callbackPayload);
-        payment.setPaidAt(LocalDateTime.now());
+        payment.setPaidAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setPaymentAccountLabel(PaymentAccountSupport.resolveFromCallback(payment.getProvider(), params));
     }

@@ -225,7 +225,7 @@ class BookingIntegrationTests {
                 "BKEXPIRED" + System.nanoTime(),
                 customer,
                 showtime,
-                LocalDateTime.now().minusMinutes(1)
+                java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).minusMinutes(1)
         ));
         BookingSeat heldSeat = bookingSeatRepository.save(new BookingSeat(
                 expiredHold,
@@ -507,7 +507,7 @@ class BookingIntegrationTests {
         seatRepository.save(new Seat(room, seatRow, 1, 1, SeatType.NORMAL));
         seatRepository.save(new Seat(room, seatRow, 2, 2, SeatType.NORMAL));
 
-        LocalDateTime startTime = LocalDateTime.now().plusMinutes(5);
+        LocalDateTime startTime = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(5);
         Showtime showtime = new Showtime(
                 savedMovie,
                 room,

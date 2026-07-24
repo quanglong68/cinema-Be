@@ -116,7 +116,7 @@ public class RefundServiceImpl implements RefundService {
         releaseSeats(booking);
         booking.setQrCode(null);
         booking.setStatus(BookingStatus.REFUNDED);
-        booking.setRefundedAt(LocalDateTime.now());
+        booking.setRefundedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         booking.setRefundReason(refundReason);
         booking.setRefundMethod("CINEWALLET");
         booking.setBulkRefund(bulk);
@@ -128,7 +128,7 @@ public class RefundServiceImpl implements RefundService {
         if (payment != null) {
             payment.setStatus(PaymentStatus.REFUNDED);
             payment.setRefundAmount(refundAmount);
-            payment.setRefundedAt(LocalDateTime.now());
+            payment.setRefundedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
             payment.setRefundTransactionNo(refCode);
             payment.setRefundMethod("CINEWALLET");
             payment.setPaymentAccountLabel(null);
@@ -162,7 +162,7 @@ public class RefundServiceImpl implements RefundService {
 
     private void cancelUnpaidBooking(Booking booking) {
         releaseSeats(booking);
-        booking.setCancelledAt(LocalDateTime.now());
+        booking.setCancelledAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         booking.setStatus(BookingStatus.CANCELLED);
     }
 

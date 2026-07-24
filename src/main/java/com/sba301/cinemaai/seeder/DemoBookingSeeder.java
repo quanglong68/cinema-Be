@@ -147,7 +147,7 @@ public class DemoBookingSeeder implements Seeder {
 
     private void seedBookingWithPayment(User user, Showtime showtime,
                                         String code, int personaIdx, int bookingIdx) {
-        LocalDateTime paidAt = LocalDateTime.now()
+        LocalDateTime paidAt = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"))
             .minusDays(29 - (long)(personaIdx * 3 + bookingIdx) % 28)
             .withHour(10 + bookingIdx * 2)
             .withMinute(30).withSecond(0).withNano(0);

@@ -30,7 +30,7 @@ public class ShowtimeStatusScheduler {
     @Scheduled(fixedDelayString = "${app.showtime.scheduler.fixed-delay-ms:60000}")
     @Transactional
     public void updateShowtimeStatuses() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
 
         List<Showtime> toOpen = showtimeRepository.findScheduledReadyToOpen(now);
         for (Showtime showtime : toOpen) {

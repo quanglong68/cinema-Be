@@ -195,7 +195,7 @@ public class ReportServiceImpl implements ReportService {
         LocalDate safeTo = to != null ? to : LocalDate.now();
         LocalDateTime dtFrom = safeFrom.atStartOfDay();
         LocalDateTime dtTo = safeTo.plusDays(1).atStartOfDay();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
 
         long noShows = bookingRepository.countNoShows(dtFrom, dtTo, now);
         long finished = bookingRepository.countFinishedPaidBookings(dtFrom, dtTo, now);

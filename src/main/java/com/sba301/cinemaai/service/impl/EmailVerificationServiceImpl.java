@@ -34,7 +34,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                         user,
                         generateOtp(),
                         EmailOtpPurpose.EMAIL_VERIFICATION,
-                        LocalDateTime.now().plusSeconds(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS)
+                        java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS)
                 )
         );
         mailService.sendOtp(user.getEmail(), verificationToken.getToken(), "Email verification");
@@ -48,7 +48,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                         user,
                         generateOtp(),
                         EmailOtpPurpose.GOOGLE_LOGIN,
-                        LocalDateTime.now().plusMinutes(5)
+                        java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(5)
                 )
         );
         mailService.sendOtp(user.getEmail(), verificationToken.getToken(), "Google login");
@@ -84,7 +84,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     public void verify(String token) {
         EmailVerificationToken verificationToken = emailVerificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new BadRequestException("Invalid OTP"));
-        if (verificationToken.isUsed() || verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (verificationToken.isUsed() || verificationToken.getExpiresAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
             throw new BadRequestException("OTP is expired or already used");
         }
         activateEmail(verificationToken.getUser());
@@ -97,7 +97,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                     .filter(token -> token.getPurpose() == purpose)
                     .filter(token -> !token.isUsed())
                     .orElseThrow(() -> new BadRequestException("Invalid OTP"));
-            if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            if (verificationToken.getExpiresAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
                 throw new BadRequestException("OTP is expired or already used");
             }
             return verificationToken;
@@ -106,7 +106,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         EmailVerificationToken verificationToken = emailVerificationTokenRepository
                 .findFirstByUserEmailAndTokenAndPurposeAndUsedFalseOrderByCreatedAtDesc(email, otp, purpose)
                 .orElseThrow(() -> new BadRequestException("Invalid OTP"));
-        if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (verificationToken.getExpiresAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
             throw new BadRequestException("OTP is expired or already used");
         }
         return verificationToken;

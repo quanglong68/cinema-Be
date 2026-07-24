@@ -74,6 +74,6 @@ public class LoyaltyPointTransaction extends BaseEntity {
         this.pointsDelta = pointsDelta;
         this.balanceAfter = balanceAfter;
         this.note = note;
-        this.occurredAt = LocalDateTime.now();
+        this.occurredAt = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
     }
 }

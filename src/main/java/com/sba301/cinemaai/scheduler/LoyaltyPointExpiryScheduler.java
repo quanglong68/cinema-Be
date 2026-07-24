@@ -36,7 +36,7 @@ public class LoyaltyPointExpiryScheduler {
                 return;
             }
             LocalTime configuredTime = LocalTime.parse(config.getExpiryTime());
-            if (LocalDateTime.now().toLocalTime().isBefore(configuredTime)) {
+            if (java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).toLocalTime().isBefore(configuredTime)) {
                 return;
             }
             int affectedAccounts = loyaltyPointService.expireAllActivePoints("SYSTEM");

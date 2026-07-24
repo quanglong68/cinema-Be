@@ -111,7 +111,7 @@ public class BulkRefundServiceImpl implements BulkRefundService {
         releaseSeats(booking);
         booking.setQrCode(null);
         booking.setStatus(BookingStatus.REFUNDED);
-        booking.setRefundedAt(LocalDateTime.now());
+        booking.setRefundedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         booking.setRefundReason(refundReason);
         booking.setRefundMethod("CINEWALLET");
         booking.setBulkRefund(true);
@@ -123,7 +123,7 @@ public class BulkRefundServiceImpl implements BulkRefundService {
         if (payment != null) {
             payment.setStatus(PaymentStatus.REFUNDED);
             payment.setRefundAmount(refundAmount);
-            payment.setRefundedAt(LocalDateTime.now());
+            payment.setRefundedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
             payment.setRefundTransactionNo(refCode);
             payment.setRefundMethod("CINEWALLET");
             payment.setPaymentAccountLabel(null);

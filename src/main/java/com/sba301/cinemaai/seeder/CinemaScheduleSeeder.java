@@ -106,7 +106,7 @@ public class CinemaScheduleSeeder implements Seeder {
                 for (int[] slot : slots) {
                     Movie movie = nowShowing.get(movieIndex % nowShowing.size());
                     movieIndex++;
-                    LocalDateTime startTime = LocalDateTime.now()
+                    LocalDateTime startTime = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"))
                             .plusDays(day).withHour(slot[0]).withMinute(slot[1]).withSecond(0).withNano(0);
                     seedShowtime(room, movie, startTime);
                 }

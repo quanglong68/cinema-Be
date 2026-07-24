@@ -15,14 +15,14 @@ public record ApiResponse<T>(
     }
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, data, "Success", LocalDateTime.now());
+        return new ApiResponse<>(true, data, "Success", java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     public static <T> ApiResponse<T> success(T data, String message) {
-        return new ApiResponse<>(true, data, message, LocalDateTime.now());
+        return new ApiResponse<>(true, data, message, java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     public static <T> ApiResponse<T> failure(String message) {
-        return new ApiResponse<>(false, null, message, LocalDateTime.now());
+        return new ApiResponse<>(false, null, message, java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 }

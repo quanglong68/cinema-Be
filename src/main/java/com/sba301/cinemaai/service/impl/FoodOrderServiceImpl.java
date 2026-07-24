@@ -86,7 +86,7 @@ public class FoodOrderServiceImpl implements FoodOrderService {
                 .orElseThrow(() -> new NotFoundException("Food order not found"));
         validateOwner(order, email);
         if (order.getStatus() == FoodOrderStatus.PENDING_PAYMENT
-                && (order.getExpiresAt() == null || !LocalDateTime.now().isBefore(order.getExpiresAt()))) {
+                && (order.getExpiresAt() == null || !java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).isBefore(order.getExpiresAt()))) {
             order.setStatus(FoodOrderStatus.EXPIRED);
             return toResponse(order);
         }
@@ -94,7 +94,7 @@ public class FoodOrderServiceImpl implements FoodOrderService {
             throw new BadRequestException("Only pending food orders can be cancelled");
         }
         order.setStatus(FoodOrderStatus.CANCELLED);
-        order.setCancelledAt(LocalDateTime.now());
+        order.setCancelledAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         paymentRepository.findByFoodOrder(order).stream()
                 .filter(payment -> payment.getStatus() == PaymentStatus.PENDING)
                 .forEach(payment -> {
@@ -109,7 +109,7 @@ public class FoodOrderServiceImpl implements FoodOrderService {
     public int expirePendingOrders() {
         List<FoodOrder> expired = foodOrderRepository.findByStatusAndExpiresAtLessThanEqual(
                 FoodOrderStatus.PENDING_PAYMENT,
-                LocalDateTime.now()
+                java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"))
         );
         expired.forEach(order -> {
             order.setStatus(FoodOrderStatus.EXPIRED);
@@ -155,11 +155,11 @@ public class FoodOrderServiceImpl implements FoodOrderService {
         payment.setFoodOrder(order);
         payment.setPaymentAccountLabel("Tiền mặt tại quầy");
         payment.setTransactionId("STAFF-" + System.currentTimeMillis());
-        payment.setPaidAt(LocalDateTime.now());
+        payment.setPaidAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         payment.setStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(payment);
         order.setStatus(FoodOrderStatus.PAID);
-        order.setPaidAt(LocalDateTime.now());
+        order.setPaidAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         auditLogService.record(AuditActionType.CREATE, "FOOD_ORDER", order.getId(),
                 order.getOrderCode() + " - " + order.getTotalAmount() + " VND");
         return toResponse(order);
@@ -186,7 +186,7 @@ public class FoodOrderServiceImpl implements FoodOrderService {
             throw new BadRequestException("Only paid food orders can be picked up");
         }
         order.setStatus(FoodOrderStatus.PICKED_UP);
-        order.setPickedUpAt(LocalDateTime.now());
+        order.setPickedUpAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         auditLogService.record(AuditActionType.UPDATE, "FOOD_ORDER", order.getId(),
                 order.getOrderCode() + " - picked up");
         return toResponse(order);
@@ -198,7 +198,7 @@ public class FoodOrderServiceImpl implements FoodOrderService {
         }
         FoodOrder order = foodOrderRepository.save(new FoodOrder(booking, customer, newOrderCode(), byStaff));
         if (!byStaff) {
-            order.setExpiresAt(LocalDateTime.now().plusMinutes(PAYMENT_WINDOW_MINUTES));
+            order.setExpiresAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(PAYMENT_WINDOW_MINUTES));
         }
         BigDecimal total = BigDecimal.ZERO;
         for (BookingFoodRequest foodRequest : request.foods()) {
@@ -219,7 +219,7 @@ public class FoodOrderServiceImpl implements FoodOrderService {
         if (showtime.getStatus() == ShowtimeStatus.CANCELLED || showtime.getStatus() == ShowtimeStatus.COMPLETED) {
             throw new BadRequestException("Showtime has ended - food ordering is closed");
         }
-        if (showtime.getEndTime() != null && LocalDateTime.now().isAfter(showtime.getEndTime())) {
+        if (showtime.getEndTime() != null && java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).isAfter(showtime.getEndTime())) {
             throw new BadRequestException("Showtime has ended - food ordering is closed");
         }
     }

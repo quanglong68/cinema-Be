@@ -87,7 +87,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     public PageResponse<ShowtimeResponse> searchPublic(Long movieId, Long roomId, LocalDate date, int page, int size) {
         LocalDateTime from = date == null ? LocalDate.now().atStartOfDay() : date.atStartOfDay();
         LocalDateTime to = date == null ? LocalDate.now().plusYears(1).atStartOfDay() : date.plusDays(1).atStartOfDay();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
         if (from.isBefore(now)) {
             from = now;
         }
@@ -185,7 +185,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
         LocalDateTime windowStart = date.atTime(OPERATING_START);
         LocalDateTime windowEnd = date.atTime(OPERATING_END);
-        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        LocalDateTime now = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).withSecond(0).withNano(0);
         if (windowStart.isBefore(now)) {
             int remainder = now.getMinute() % SLOT_STEP_MINUTES;
             windowStart = remainder == 0 ? now : now.plusMinutes(SLOT_STEP_MINUTES - remainder);
@@ -262,7 +262,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             if (room.getStatus() != RoomStatus.ACTIVE) {
                 throw new BadRequestException(slotLabel + ": room " + room.getName() + " is not active");
             }
-            if (!slot.startTime().isAfter(LocalDateTime.now())) {
+            if (!slot.startTime().isAfter(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
                 throw new BadRequestException(slotLabel + ": start time must be in the future");
             }
             validateShowtimeWithinMovieReleaseWindow(movie, slot.startTime(), slotLabel + ": ");
@@ -432,7 +432,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         if (room.getStatus() != RoomStatus.ACTIVE) {
             throw new BadRequestException("Cannot schedule showtime in room " + room.getName() + " because it is not active");
         }
-        if (!startTime.isAfter(LocalDateTime.now())) {
+        if (!startTime.isAfter(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
             throw new BadRequestException("Showtime start time must be in the future");
         }
         if (!endTime.isAfter(startTime)) {
@@ -512,7 +512,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         }
         // Guard: cannot mark completed before the show ends
         if (requestedStatus == ShowtimeStatus.COMPLETED
-                && LocalDateTime.now().isBefore(showtime.getEndTime())) {
+                && java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).isBefore(showtime.getEndTime())) {
             throw new BadRequestException("Cannot complete a showtime before it has ended");
         }
         // Guard: SCHEDULED can only go to OPEN or CANCELLED
@@ -656,7 +656,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         if (!holdLikeBooking || !holdLikeSeat || booking.getHoldExpiresAt() == null) {
             return null;
         }
-        return booking.getHoldExpiresAt().isAfter(LocalDateTime.now()) ? booking.getHoldExpiresAt() : null;
+        return booking.getHoldExpiresAt().isAfter(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"))) ? booking.getHoldExpiresAt() : null;
     }
 
     private boolean isSeatMapBlockingSeat(BookingSeat bookingSeat) {
@@ -665,7 +665,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         }
         Booking booking = bookingSeat.getBooking();
         if (booking.getStatus() == BookingStatus.HOLDING || booking.getStatus() == BookingStatus.PENDING_PAYMENT) {
-            return booking.getHoldExpiresAt() == null || booking.getHoldExpiresAt().isAfter(LocalDateTime.now());
+            return booking.getHoldExpiresAt() == null || booking.getHoldExpiresAt().isAfter(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         }
         return bookingSeat.getStatus() == SeatRuntimeStatus.BOOKED
                 || bookingSeat.getStatus() == SeatRuntimeStatus.CHECKED_IN;
@@ -683,7 +683,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     private void applyShowtimeCancellation(Showtime showtime, String reason) {
         showtime.setCancellationReason(reason == null || reason.isBlank() ? null : reason.trim());
-        showtime.setCancelledAt(LocalDateTime.now());
+        showtime.setCancelledAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
 }

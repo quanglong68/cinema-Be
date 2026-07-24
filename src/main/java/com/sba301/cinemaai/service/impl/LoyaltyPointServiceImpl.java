@@ -232,7 +232,7 @@ public class LoyaltyPointServiceImpl implements LoyaltyPointService {
     @Override
     @Transactional(readOnly = true)
     public LoyaltyReportResponse getReport(LocalDateTime from, LocalDateTime to) {
-        LocalDateTime safeTo = to == null ? LocalDateTime.now() : to;
+        LocalDateTime safeTo = to == null ? java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")) : to;
         LocalDateTime safeFrom = from == null ? safeTo.minusMonths(1) : from;
         long issued = loyaltyPointTransactionRepository.sumDeltaByTypeBetween(LoyaltyPointType.EARN, safeFrom, safeTo);
         long burned = Math.abs(loyaltyPointTransactionRepository.sumDeltaByTypeBetween(LoyaltyPointType.REDEEM, safeFrom, safeTo));
@@ -255,7 +255,7 @@ public class LoyaltyPointServiceImpl implements LoyaltyPointService {
         }
         LoyaltyConfiguration config = getOrCreateConfiguration();
         config.setLastExpiredAt(LocalDate.now());
-        config.setLastResetAt(LocalDateTime.now());
+        config.setLastResetAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         config.setLastResetSource(resetSource == null || resetSource.isBlank() ? "SYSTEM" : resetSource.trim().toUpperCase(Locale.ROOT));
         loyaltyConfigurationRepository.save(config);
         auditLogService.record(AuditActionType.UPDATE, "LOYALTY", config.getId(),
@@ -418,7 +418,7 @@ public class LoyaltyPointServiceImpl implements LoyaltyPointService {
     }
 
     private void validateExpiryDateTime(LocalDate expiryDate, LocalTime expiryTime) {
-        LocalDateTime minimumAllowed = LocalDateTime.now().plusMinutes(MIN_EXPIRY_LEAD_MINUTES);
+        LocalDateTime minimumAllowed = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(MIN_EXPIRY_LEAD_MINUTES);
         if (LocalDateTime.of(expiryDate, expiryTime).isBefore(minimumAllowed)) {
             throw new BadRequestException("Ngày và giờ reset điểm phải sau thời điểm hiện tại ít nhất 15 phút");
         }

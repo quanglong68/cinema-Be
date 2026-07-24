@@ -113,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
                 pendingRegistration.getPhone(),
                 pendingRegistration.getBirthYear(),
                 generateOtp(),
-                LocalDateTime.now().plusSeconds(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS)
+                java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS)
         );
         mailService.sendOtp(pendingRegistration.getEmail(), pendingRegistration.getOtp(), "Email verification");
     }
@@ -125,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
             emailVerificationService.verifyEmail(email, otp);
             return;
         }
-        if (pendingRegistration.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (pendingRegistration.getExpiresAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
             throw new BadRequestException("OTP is expired or already used");
         }
         if (userRepository.existsByEmail(pendingRegistration.getEmail())) {

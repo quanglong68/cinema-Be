@@ -183,7 +183,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private void requireWithinCustomerEditWindow(Review review) {
-        if (review.getCreatedAt() == null || review.getCreatedAt().isBefore(LocalDateTime.now().minusHours(24))) {
+        if (review.getCreatedAt() == null || review.getCreatedAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).minusHours(24))) {
             throw new BadRequestException("Review can only be changed within 24 hours after creation");
         }
     }

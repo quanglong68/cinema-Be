@@ -154,7 +154,7 @@ public class WalletServiceImpl implements WalletService {
         wr.setStatus(WithdrawalStatus.PAID);
         wr.setProcessedMethod(request.method());
         wr.setProcessedNote(request.note());
-        wr.setProcessedAt(LocalDateTime.now());
+        wr.setProcessedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         withdrawalRequestRepository.save(wr);
 
         log.info("Withdrawal {} approved via {} for user {}", withdrawalId, request.method(), wr.getUser().getEmail());
@@ -182,7 +182,7 @@ public class WalletServiceImpl implements WalletService {
 
         wr.setStatus(WithdrawalStatus.REJECTED);
         wr.setProcessedNote(request.note());
-        wr.setProcessedAt(LocalDateTime.now());
+        wr.setProcessedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         withdrawalRequestRepository.save(wr);
 
         // Tạo wallet transaction WITHDRAWAL_REJECTED

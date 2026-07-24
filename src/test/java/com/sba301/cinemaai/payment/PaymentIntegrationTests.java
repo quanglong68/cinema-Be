@@ -331,7 +331,7 @@ class PaymentIntegrationTests {
 
     private Booking createPendingBooking(User customer) {
         Showtime showtime = createShowtimeFixture();
-        Booking booking = new Booking("BKPAY" + System.nanoTime(), customer, showtime, LocalDateTime.now().plusMinutes(10));
+        Booking booking = new Booking("BKPAY" + System.nanoTime(), customer, showtime, java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(10));
         booking.setSubtotal(BigDecimal.valueOf(125000));
         booking.setDiscountAmount(BigDecimal.ZERO);
         booking.setTotalAmount(BigDecimal.valueOf(125000));

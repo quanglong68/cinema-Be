@@ -21,7 +21,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Transactional
     public RefreshToken create(User user) {
-        LocalDateTime expiresAt = LocalDateTime.now().plusNanos(jwtProperties.refreshExpirationMs() * 1_000_000);
+        LocalDateTime expiresAt = java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusNanos(jwtProperties.refreshExpirationMs() * 1_000_000);
         return refreshTokenRepository.save(new RefreshToken(user, UUID.randomUUID().toString(), expiresAt));
     }
 
@@ -29,7 +29,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken validate(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
-        if (refreshToken.isRevoked() || refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (refreshToken.isRevoked() || refreshToken.getExpiresAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
             throw new UnauthorizedException("Refresh token is expired or revoked");
         }
         return refreshToken;

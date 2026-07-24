@@ -35,7 +35,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
                 new PasswordResetToken(
                         user,
                         generateOtp(),
-                        LocalDateTime.now().plusMinutes(PASSWORD_RESET_OTP_EXPIRES_IN_MINUTES)
+                        java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(PASSWORD_RESET_OTP_EXPIRES_IN_MINUTES)
                 )
         );
         mailService.sendOtp(user.getEmail(), resetToken.getToken(), "Đặt lại mật khẩu");
@@ -63,7 +63,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         PasswordResetToken resetToken = passwordResetTokenRepository
                 .findFirstByUserEmailAndTokenAndUsedFalseOrderByCreatedAtDesc(email, otp)
                 .orElseThrow(() -> new BadRequestException("Invalid password reset OTP"));
-        if (resetToken.isUsed() || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (resetToken.isUsed() || resetToken.getExpiresAt().isBefore(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")))) {
             throw new BadRequestException("Password reset OTP is expired or already used");
         }
         return resetToken;

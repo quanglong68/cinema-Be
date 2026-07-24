@@ -249,7 +249,7 @@ class CinemaShowtimeIntegrationTests {
                         .content(objectMapper.writeValueAsString(new ShowtimeRequest(
                                 movie.getId(),
                                 roomId,
-                                LocalDateTime.now().minusDays(1),
+                                java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).minusDays(1),
                                 BigDecimal.valueOf(95000),
                                 null,
                                 null,
@@ -371,7 +371,7 @@ class CinemaShowtimeIntegrationTests {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Không thể cập nhật suất chiếu vì đang có đặt vé hoạt động"));
 
-        activeBooking.setCancelledAt(java.time.LocalDateTime.now());
+        activeBooking.setCancelledAt(java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
         activeBooking.setStatus(com.sba301.cinemaai.enums.BookingStatus.CANCELLED);
         bookingRepository.save(activeBooking);
 
@@ -557,7 +557,7 @@ class CinemaShowtimeIntegrationTests {
                 "SHOWTIME-" + System.nanoTime(),
                 savedCustomer,
                 showtime,
-                LocalDateTime.now().plusMinutes(15)
+                java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(15)
         );
         booking.setStatus(com.sba301.cinemaai.enums.BookingStatus.PENDING_PAYMENT);
         return bookingRepository.save(booking);

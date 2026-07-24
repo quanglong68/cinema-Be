@@ -17,10 +17,10 @@ public record ErrorResponse(
     }
 
     public static ErrorResponse of(String message, String path) {
-        return new ErrorResponse(false, message, path, List.of(), LocalDateTime.now());
+        return new ErrorResponse(false, message, path, List.of(), java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     public static ErrorResponse of(String message, String path, List<FieldErrorResponse> errors) {
-        return new ErrorResponse(false, message, path, errors, LocalDateTime.now());
+        return new ErrorResponse(false, message, path, errors, java.time.LocalDateTime.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 }
