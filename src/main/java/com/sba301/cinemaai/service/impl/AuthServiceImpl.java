@@ -63,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+        // 1. Giữ nguyên logic kiểm tra trùng lặp Email và SĐT
         if (userRepository.existsByEmail(request.email())) {
             throw new ConflictException("Email already exists");
         }
@@ -70,42 +71,30 @@ public class AuthServiceImpl implements AuthService {
             if (userProfileRepository.existsByPhone(request.phone())) {
                 throw new ConflictException("Phone already exists");
             }
-            pendingRegistrationRepository.findByPhone(request.phone())
-                    .filter(pendingRegistration -> !pendingRegistration.getEmail().equals(request.email()))
-                    .ifPresent(pendingRegistration -> {
-                        throw new ConflictException("Phone already exists");
-                    });
+            // Đã xóa phần kiểm tra trong PendingRegistration vì không dùng tới nữa
         }
 
-        String otp = generateOtp();
-        LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS);
-        PendingRegistration pendingRegistration = pendingRegistrationRepository.findByEmail(request.email())
-                .map(existing -> {
-                    refreshPendingRegistration(
-                            existing,
-                            passwordEncoder.encode(request.password()),
-                            request.fullName(),
-                            request.phone(),
-                            request.birthYear(),
-                            otp,
-                            expiresAt
-                    );
-                    return existing;
-                })
-                .orElseGet(() -> pendingRegistrationRepository.save(new PendingRegistration(
-                        request.email(),
-                        passwordEncoder.encode(request.password()),
-                        request.fullName(),
-                        request.phone(),
-                        request.birthYear(),
-                        otp,
-                        expiresAt
-                )));
-        mailService.sendOtp(pendingRegistration.getEmail(), pendingRegistration.getOtp(), "Email verification");
+        // 2. TẠO THẲNG TÀI KHOẢN CHÍNH THỨC (Bỏ qua PendingRegistration)
+        User user = userRepository.save(new User(
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                request.fullName(),
+                request.phone(),
+                request.birthYear()
+        ));
+        
+        // 3. Kích hoạt tài khoản và gán quyền CUSTOMER ngay lập tức
+        activateEmail(user);
+        userRoleService.assignRole(user, RoleName.CUSTOMER);
+
+        // 4. (Đã vô hiệu hóa) Không gửi mail OTP nữa
+        // mailService.sendOtp(request.email(), "123456", "Email verification");
+
+        // 5. Trả về kết quả báo cho Frontend biết là KHÔNG CẦN OTP (requireOtp = false)
         return new RegisterResponse(
-                toPendingProfile(pendingRegistration),
-                true,
-                EMAIL_VERIFICATION_EXPIRES_IN_SECONDS
+                userService.toProfile(user),
+                false, // requireOtp = false -> Frontend sẽ tự động nhảy thẳng vào app
+                0
         );
     }
 
